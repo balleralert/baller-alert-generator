@@ -2,7 +2,6 @@ const fetch = require('node-fetch');
 const cheerio = require('cheerio');
 
 module.exports = async (req, res) => {
-  // CORS headers so the frontend can call this
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -17,7 +16,6 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: 'Missing url parameter' });
   }
 
-  // Only allow balleralert.com URLs
   if (!url.includes('balleralert.com')) {
     return res.status(400).json({ error: 'Only balleralert.com URLs are supported' });
   }
@@ -38,31 +36,26 @@ module.exports = async (req, res) => {
     const html = await response.text();
     const $ = cheerio.load(html);
 
-    // Extract headline - og:title is most reliable
     let headline = $('meta[property="og:title"]').attr('content')
       || $('meta[name="twitter:title"]').attr('content')
       || $('h1').first().text()
       || '';
 
-    // Clean up
     headline = headline
-      .replace(/\s*[-|–]\s*Baller Alert.*$/i, '')
       .replace(/\[Video\]/gi, '')
       .replace(/\[Photos?\]/gi, '')
       .trim();
 
-    // Extract image - og:image is most reliable
     let imageUrl = $('meta[property="og:image"]').attr('content')
       || $('meta[name="twitter:image"]').attr('content')
       || '';
 
-    // Fallback: first large image in article
     if (!imageUrl) {
       $('article img, .entry-content img, .jeg_featured img').each((i, el) => {
         const src = $(el).attr('src') || $(el).attr('data-src') || '';
         if (src && src.startsWith('http') && !src.includes('150x150') && !src.includes('avatar')) {
           imageUrl = src;
-          return false; // break
+          return false;
         }
       });
     }
@@ -71,7 +64,6 @@ module.exports = async (req, res) => {
       return res.status(422).json({ error: 'Could not extract headline from article' });
     }
 
-    // Fetch the image and return it as base64 so frontend can use it directly
     let imageBase64 = null;
     let imageMimeType = 'image/jpeg';
 
@@ -92,14 +84,13 @@ module.exports = async (req, res) => {
         }
       } catch (imgErr) {
         console.error('Image fetch failed:', imgErr.message);
-        // Continue without image — frontend will show upload prompt
       }
     }
 
     return res.status(200).json({
       headline,
       imageUrl,
-      imageBase64  // null if image fetch failed
+      imageBase64
     });
 
   } catch (err) {
@@ -107,3 +98,10 @@ module.exports = async (req, res) => {
     return res.status(500).json({ error: err.message || 'Failed to fetch article' });
   }
 };
+```
+
+For `index.html` — same as before, go to GitHub → `public/index.html` → pencil → find these 2 things and change them:
+
+**Find:**
+```
+rgba(0,0,0,0) 55%, rgba(0,0,0,0.7) 68%, rgba(0,0,0,0.98) 78%
