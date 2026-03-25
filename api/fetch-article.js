@@ -98,10 +98,3 @@ module.exports = async (req, res) => {
     return res.status(500).json({ error: err.message || 'Failed to fetch article' });
   }
 };
-```
-
-For `index.html` — same as before, go to GitHub → `public/index.html` → pencil → find these 2 things and change them:
-
-**Find:**
-```
-rgba(0,0,0,0) 55%, rgba(0,0,0,0.7) 68%, rgba(0,0,0,0.98) 78%
