@@ -122,6 +122,7 @@
   <div class="url-row">
     <input type="text" id="url-input" placeholder="https://balleralert.com/profiles/blogs/..." />
     <button id="fetch-btn" onclick="fetchStory()">Fetch</button>
+   <button class="btn-secondary" onclick="doManually()" style="white-space:nowrap">Do Manually</button>
   </div>
   <div class="status" id="fetch-status"></div>
 </div>
@@ -200,6 +201,18 @@ async function fetchStory() {
   }
   btn.disabled = false;
   btn.textContent = 'Fetch';
+}
+Click right before `function setImage` and paste this **above** it:
+
+```javascript
+function doManually() {
+  document.getElementById('headline-input').value = '';
+  document.getElementById('post-headline').textContent = 'Headline goes here';
+  document.getElementById('post-bg').src = '';
+  document.getElementById('img-thumb-box').innerHTML = '🖼';
+  document.getElementById('img-status-text').textContent = 'Upload your image below';
+  document.getElementById('fetch-status').className = 'status';
+  showEditAndPreview();
 }
 
 function setImage(src) {
