@@ -36,9 +36,9 @@ module.exports = async (req, res) => {
     const html = await response.text();
     const $ = cheerio.load(html);
 
-    let headline = $('meta[property="og:title"]').attr('content')
+    let headline = $('h1').first().text()
+      || $('meta[property="og:title"]').attr('content')
       || $('meta[name="twitter:title"]').attr('content')
-      || $('h1').first().text()
       || '';
 
     headline = headline
